@@ -24,7 +24,16 @@ const getBooks = new Promise((resolve, reject) => {
   }
 });
 
-
+const getBooksByISBN = (isbn) => {
+  return new Promise((resolve, reject) => {
+    try {
+      let book = books[isbn];
+      resolve(book)
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 public_users.post("/register", (req, res) => {
   //Write your code here
   username = req.body.username;
@@ -62,28 +71,43 @@ public_users.get("/", function (req, res) {
   // }
 
   // With Promises
-  getBooks.then((bookList) => {
-    return res.status(200).send({ books: bookList });
-  }).catch((error) => {
-    console.log(error);
-  })
+  getBooks
+    .then((bookList) => {
+      return res.status(200).send({ books: bookList });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 });
 
 // Get book details based on ISBN
 public_users.get("/isbn/:isbn", function (req, res) {
   //Write your code here
-  let book = books[req.params.isbn];
-  if (book) {
-    return res
-      .status(200)
-      .send({
-        author: book.author,
-        isbn: req.params.isbn,
-        title: book.title,
-        reviews: book.reviews,
-      });
-  }
-  return res.status(400).send("Book not found");
+  // let book = books[req.params.isbn];
+  // if (book) {
+  //   return res
+  //     .status(200)
+  //     .send({
+  //       author: book.author,
+  //       isbn: req.params.isbn,
+  //       title: book.title,
+  //       reviews: book.reviews,
+  //     });
+  // }
+  
+  // With Promises
+  getBooksByISBN(req.params.isbn)
+    .then((book) => {
+      return res.status(200).send({
+              author: book.author,
+              isbn: req.params.isbn,
+              title: book.title,
+              reviews: book.reviews,
+            });
+    }).catch((error) => {
+      console.log(error);
+      return res.status(400).send("Book not found");
+    })
 });
 
 // Get book details based on author
