@@ -34,6 +34,28 @@ const getBooksByISBN = (isbn) => {
     }
   });
 };
+
+const getBooksByAuthor = (author) => {
+  return new Promise((resolve, reject) => {
+    try {
+      let bookList = [];
+      for (let book in books) {
+        if (books[book].author == author) {
+          bookList.push({
+            author: books[book].author,
+            isbn: book,
+            title: books[book].title,
+            reviews: books[book].reviews,
+          });
+        }
+      }
+      resolve(bookList);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 public_users.post("/register", (req, res) => {
   //Write your code here
   username = req.body.username;
@@ -115,20 +137,25 @@ public_users.get("/author/:author", function (req, res) {
   //Write your code here
   const author = req.params.author;
   let bookList = [];
-  for (let book in books) {
-    if (books[book].author == author) {
-      bookList.push({
-        author: books[book].author,
-        isbn: book,
-        title: books[book].title,
-        reviews: books[book].reviews,
-      });
+  // for (let book in books) {
+  //   if (books[book].author == author) {
+  //     bookList.push({
+  //       author: books[book].author,
+  //       isbn: book,
+  //       title: books[book].title,
+  //       reviews: books[book].reviews,
+  //     });
+  //   }
+  // }
+  getBooksByAuthor(author).then((bookList) => {
+    if (bookList.length > 0) {
+      return res.status(200).send({ books: bookList });
     }
-  }
-  if (bookList.length > 0) {
-    return res.status(200).send({ books: bookList });
-  }
-  return res.status(400).send("Book not found");
+    return res.status(400).send("Book not found");
+  }).catch((error) => {
+    console.log(error);
+    return res.status(400).send("Book not found");
+  })
 });
 
 // Get all books based on title
