@@ -45,7 +45,6 @@ regd_users.post("/login", (req, res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
   const isbn = req.params.isbn;
   const review = req.body.review;
   const user = req.session.user;
@@ -77,7 +76,7 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
   }
   
   books[isbn].reviews = books[isbn].reviews.filter((review) => review.username !== user.username);
-  
+
   return res.status(200).send({ message: "Review deleted successfully" });
 })
 
