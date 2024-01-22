@@ -58,23 +58,26 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   if (!books[isbn]) {
     return res.status(400).send("Book not found");
   }
-  books[isbn].reviews[user.username] = review;
+  books[isbn].reviews.push({ username: user.username, review: review });
   return res.status(200).send({ message: "Review added successfully" });
 });
 
 regd_users.delete("/auth/review/:isbn", (req, res) => {
   const isbn = req.params.isbn;
   const user = req.session.user;
+
   if (!user) {
-    return res.status(401).send("Unauthorized");
+    return res.status(401).send({ message: "Unauthorized"});
   }
   if (!books[isbn]) {
-    return res.status(400).send("Book not found");
+    return res.status(400).send({ message: "Book not found"});
   }
-  if (!books[isbn].reviews[user.username]) {
-    return res.status(400).send("Review not found");
+  if (books[isbn].reviews.length === 0) {
+    return res.status(400).send({message: "No reviews found"});
   }
-  delete books[isbn].reviews[user.username];
+  
+  books[isbn].reviews = books[isbn].reviews.filter((review) => review.username !== user.username);
+  
   return res.status(200).send({ message: "Review deleted successfully" });
 })
 
