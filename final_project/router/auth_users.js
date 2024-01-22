@@ -34,7 +34,7 @@ regd_users.post("/login", (req, res) => {
   }
   if (authenticatedUser(username, password)) {
     const user = users.find((user) => user.username === username);
-    const token = jwt.sign({ username: username }, "loggedIn_customer", { expiresIn: "1h" });
+    const token = jwt.sign({ username: username }, "fingerprint_customer", { expiresIn: "1h" });
     user.token = token;
     req.session.user = user;  
     return res.status(200).send({ token: token, username: username, message: "User logged in successfully" });
